@@ -1,60 +1,83 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import axios from 'axios'
+import MovieTe from './components/listMovie';
+import CharDBZ from './components/charDBZ';
+import MyName from './components/myName';
+import MyPet from './components/myPet';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const API_KEY = '9037c67c';
   const [response, setPerson] = useState({}); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(false); 
   const [responseDB, setDragonball] = useState({});
-  const [responsePoke, setPoke] = useState({})
-  const [responseFilme, setFilme] = useState({})
+  const [responsePoke, setPoke] = useState({});
+  const [responseFilme, setFilme] = useState({});
+  const [text, setText] = useState(
+    localStorage.getItem('easy-input') || ''
+  );
 
   useEffect(() => {
     const getData = async () => {
     try {
-    const responseFilme = await axios.get( "https://www.omdbapi.com/?i=tt0107290&apikey=9037c67c" );
-    setFilme(responseFilme.data);
-    const responsePoke = await axios.get( "https://pokeapi.co/api/v2/pokemon/428" );
-    setPoke(responsePoke.data);
-    const responseDB = await axios.get( "https://dragonball-api.com/api/characters/38" );
-    setDragonball(responseDB.data);
-    const response = await axios.get( "https://6a79e554674f43f4db11ebc8.mockapi.io/api/person" ); 
-    setPerson(response.data); 
-    console.log("Success:", response.data); 
-    setLoading(false); 
-    } 
-    catch (e) { 
-    console.error( "Erro ao carregar API", e ); 
-    setLoading(false); 
-    setError(true); 
-    } 
+        const responseFilme = await axios.get(
+          `https://www.omdbapi.com/?i=tt0107290&apikey=${API_KEY}` );
+        setFilme(responseFilme.data);
+        // const responsePoke = await axios.get(
+        //   "https://pokeapi.co/api/v2/pokemon/428" );
+        // setPoke(responsePoke.data);
+        const responseDB = await axios.get(
+          "https://dragonball-api.com/api/characters/38" );
+        setDragonball(responseDB.data);
+        const response = await axios.get(
+          "https://6a79e554674f43f4db11ebc8.mockapi.io/api/person" ); 
+        setPerson(response.data);
+        setLoading(false); 
+        console.log("Success:", response.data);
+      } 
+      catch (error) {  
+        setLoading(false); 
+        setError(true);
+        console.error( "Erro ao carregar API", error );
+      } 
     } 
     getData(); 
   }, []);
 
-      if(loading){return (<div>Carregando</div>)}
-      if(error){return (<div>Ocorreu um erro</div>)}
+  useEffect(() => {
+    localStorage.setItem('easy-input', text);
+  }, [text]);
+  
 
+  if(loading){
+    return(<div>Carregando</div>)
+  }
+  if(error){
+    return(<div>Ocorreu um erro</div>)
+  }
         return (
           <>
             <section id="center">
+              <MovieTe/>
               <div className="hero">
-                <img src = {responseDB.image} className="base" width="170" height="380" alt="" />
+                <CharDBZ/>
               </div>
               <div>
-                <h1>{response[38].nome} {response[38].sobrenome}</h1>
-                <h1>Ki base: {responseDB.ki}</h1>
-                <h1>Ki máximo: {responseDB.maxKi}</h1>
+                <MyName/>
               </div>
-              <button
-                type="button"
-                className="counter"
-                onClick={() => setCount((count) => count + 1)}
-              >
-                Count is {count}
-              </button>
+
+              <div>
+                    <label>
+                      Digite o seu nome: 
+                    </label>
+                    <input
+                      type="text"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      placeholder="Digite algo para salvar"
+                    />
+                  </div>
             </section>
 
             <div className="ticks"></div>
@@ -74,12 +97,7 @@ function App() {
                 <p>IMDB: {responseFilme.imdbRating}</p>
               </div>
 
-              <div id="social">
-                <h2>Meu pet:</h2>
-                <p>Nome: {responsePoke.name}</p>
-                <p>Tipo(s): {responsePoke.types[0].type.name}</p>
-                <img src={responsePoke.sprites.front_default} width="300" height="300"/>
-              </div>
+              <MyPet/>
             </section>
 
             <div className="ticks"></div>

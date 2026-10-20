@@ -5,18 +5,19 @@ import MovieTe from './components/listMovie';
 import CharDBZ from './components/charDBZ';
 import MyName from './components/myName';
 import MyPet from './components/myPet';
+import ThemeButton from './components/themeButton';
 
 function App() {
   const API_KEY = '9037c67c';
-  const [response, setPerson] = useState({}); 
+  const [resPerson, setPerson] = useState({}); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(false); 
-  const [responseDB, setDragonball] = useState({});
-  const [responsePoke, setPoke] = useState({});
   const [responseFilme, setFilme] = useState({});
   const [text, setText] = useState(
     localStorage.getItem('easy-input') || ''
   );
+  const [dark, setDark] = useState(false);
+  const theme = dark ? 'theme-dark' : 'theme-light';
 
   useEffect(() => {
     const getData = async () => {
@@ -24,17 +25,11 @@ function App() {
         const responseFilme = await axios.get(
           `https://www.omdbapi.com/?i=tt0107290&apikey=${API_KEY}` );
         setFilme(responseFilme.data);
-        // const responsePoke = await axios.get(
-        //   "https://pokeapi.co/api/v2/pokemon/428" );
-        // setPoke(responsePoke.data);
-        const responseDB = await axios.get(
-          "https://dragonball-api.com/api/characters/38" );
-        setDragonball(responseDB.data);
-        const response = await axios.get(
+        const resPerson = await axios.get(
           "https://6a79e554674f43f4db11ebc8.mockapi.io/api/person" ); 
-        setPerson(response.data);
+        setPerson(resPerson.data);
         setLoading(false); 
-        console.log("Success:", response.data);
+        console.log("Success:", resPerson.data);
       } 
       catch (error) {  
         setLoading(false); 
@@ -58,8 +53,12 @@ function App() {
   }
         return (
           <>
-            <section id="center">
-              <MovieTe/>
+            <section id="center" className={theme}>
+              <ThemeButton dark={dark}
+                onToggle={() => setDark(!dark)}/>
+                <div className={theme}>
+                  <MovieTe/>
+                  </div>
               <div className="hero">
                 <CharDBZ/>
               </div>
@@ -80,9 +79,7 @@ function App() {
                   </div>
             </section>
 
-            <div className="ticks"></div>
-
-            <section id="next-steps">
+            <section id="next-steps" className={theme}>
               <div id="docs">
                 <h2>Filme favorito:</h2>
                 <p>Nome do filme: {responseFilme.Title}</p>
@@ -99,11 +96,10 @@ function App() {
 
               <MyPet/>
             </section>
-
-            <div className="ticks"></div>
-            <section id="spacer"></section>
           </>
         )
 }
 
 export default App
+
+//background: linear-gradient(45deg, #bf0603,#012641);
